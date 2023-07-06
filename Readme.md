@@ -20,7 +20,7 @@ $ pip install -r requirements.txt
 ```
 
 2. Open `summary.ipynb`
-- Crate `.env` file and set `OPENAI_API_KEY` variable. 
+- Create `.env` file and set `OPENAI_API_KEY` variable. 
 - Edit the variables in the "Input variables" cell according to your requirements.
    - Provide the YouTube video ID (`youtube_video_id`) for which you want to generate a summary.
    - Specify the language of the subscription (`language`).
