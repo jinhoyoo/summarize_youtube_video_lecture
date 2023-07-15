@@ -2,3 +2,6 @@ youtube-transcript-api==0.6.1
 python-dotenv==1.0.0
 openai==0.27.8
 langchain==0.0.154
+openai-whisper==20230314 
+yt-dlp==2023.7.6
+pydub==0.25.1 

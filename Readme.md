@@ -76,11 +76,10 @@ chapter_part_in_description = """
    - This file has the script and summary for each chapter. 
 
 
-
 ## Trobleshooting
-- To-Do 
-
-
+  - Please define '00:00:00' as start in `chapter_part_in_description`.
+  
+  
 ## FAQ 
 - To-Do 
 
