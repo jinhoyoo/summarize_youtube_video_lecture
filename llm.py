@@ -68,6 +68,36 @@ def summarize_text(text, max_token=3000, model="gpt-3.5-turbo", language="ko"):
     return corrected_text
 
 
+
+def rectify_and_summarize_text(text, max_token=3000, model="gpt-3.5-turbo", language="ko"):
+
+    positioned_command = {
+        "ko": "한국어로 요약한 글",
+        "en": "Summary note"
+    }
+        
+    prompt = f"""
+        Maintain the given language accordingly, correct all the typos, rectify any inaccuracies and summarize the text below as well-organized note.
+        ----------
+        {text}
+
+        {positioned_command[language]}:
+        """
+
+    time.sleep(0.5) # Avoid the bad request error. 
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": "You are a sophmore student."},
+            {"role": "user", "content": prompt}
+        ],
+        max_tokens=max_token
+    )
+
+    corrected_text = response.choices[0].message.content
+    return corrected_text
+
+
 def main():
 
     # Setup OpenAI API key 
