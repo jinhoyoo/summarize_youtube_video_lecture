@@ -21,3 +21,6 @@ ipython_config.py
 .env
 .vscode/
 __pycache__/
+audio/
+text/
+note/
