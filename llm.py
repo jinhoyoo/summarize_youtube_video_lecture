@@ -77,11 +77,11 @@ def rectify_and_summarize_text(text, max_token=3000, model="gpt-3.5-turbo", lang
     }
         
     prompt = f"""
-        Maintain the given language accordingly, correct all the typos, rectify any inaccuracies and summarize the text below as well-organized note.
-        ----------
-        {text}
+Ensure adherence to the provided language, rectify any typographical errors, and then create a well-structured summary of the following text with bullet points.
+----------
+{text}
 
-        {positioned_command[language]}:
+{positioned_command[language]}:
         """
 
     time.sleep(0.5) # Avoid the bad request error. 
@@ -109,12 +109,15 @@ def main():
         튼튼한 철학적 기반을 어디서 어디서 얻을 수 있을 거예요. 대학에서 얻는 겁니다. 그래서 대학은 입문하기에 중요한 거예요. 철학적 사유가 없이는 그걸 기반으로 이론을 만들어낼 수가 없기 때문입니다. 이론이 만들어내봐야 미국 사람들이 만들어낸 거 우리가 외워서 뱉여다가 여기서 그냥 대학에서 가르치는 그런 이론 밖에 나올 수 있는 게 없어요. 우리가 만들어낸 철학에서 우리가 이론을 철학에 바탕으로 이론을 만들어내서 그걸 가지고 우리가 서로 토론하고 더 좋은 것이 뭔지를생각해낼 수 있어야 되잖아요. 그래서 제가 성취해충 모형이라는 책을 이론적으로 썼습니다. 방법만을 쓴 거죠. 철학이 있으면 그걸 가지고 이론을 만들어내야 되는데 이론은 되게 방법론을 가지고 있어요. 그래서 방법론이 없으면 이론이라기 보기 어렵죠. 그건 철학이나 마찬가지죠. 그러니까 이론에는 반드시 방법론이 있어야 되는데 그 방법론을 가지고 구체적인 수단과 도구를 만들어내는 겁니다. 구체적인 수단과 도구를 가지고 현실에서 쓰는 거죠. 집행하는 겁니다. 
     """
 
-    revised_text = correct_text(text)
-    print(revised_text)
+    # revised_text = correct_text(text)
+    # print(revised_text)
 
-    print('/n')
+    # print('/n')
 
-    summary_note = summarize_text(revised_text)
+    # summary_note = summarize_text(revised_text)
+    # print(summary_note)
+
+    summary_note = rectify_and_summarize_text(text)
     print(summary_note)
 
 if __name__ == "__main__":

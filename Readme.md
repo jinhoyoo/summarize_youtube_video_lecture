@@ -5,9 +5,21 @@
 
 Youtube Script Summarizer is a tool that helps summarize YouTube scripts by chapter creators. It leverages the youtube-transcript-api, langchain, and OpenAI packages to achieve this.
 
+## Dependency
+- Python 3.11.x
+- [yt-dlp](https://pypi.org/project/yt-dlp/)
+- [pydub](https://pypi.org/project/pydub/)
+- [OpenAI-Whisper](https://pypi.org/project/openai-whisper/)
+- [langchain](https://github.com/hwchase17/langchain)
+- [OpenAI](https://github.com/openai/openai-python) 
+
 ## How it works
 
-The youtube-transcript-api package is used to extract the script from a YouTube video.  The script is then processed using the langchain package to identify the language and translate it if necessary. Finally, the OpenAI package is used to generate a summary of the script for each chapter created.
+- Obtain the audio file by using [yt-dlp](https://pypi.org/project/yt-dlp/)
+- Divide the audio file into chapters with corresponding information by using [pydub](https://pypi.org/project/pydub/)
+- Perform transcription on each audio segment utilizing [OpenAI-Whisper](https://pypi.org/project/openai-whisper/)
+- Summarize the transcriptions using the [langchain](https://github.com/hwchase17/langchain) and [OpenAI](https://github.com/openai/openai-python) packages.
+
 
 
 ## Usage
@@ -24,11 +36,6 @@ $ pip install -r requirements.txt
 - Edit the variables in the "Input variables" cell according to your requirements.
    - Provide the YouTube video ID (`youtube_video_id`) for which you want to generate a summary.
    - Specify the language of the subscription (`language`).
-   - Adjust the parameters for generating the summary:
-     - `max_token`: The maximum number of tokens in the generated summary.
-     - `model`: The OpenAI model to use for generating the summary.
-     - `chunk_size`: The size of each chunk of text for processing.
-     - `chunk_overlap`: The overlap between each chunk.
   - Copy and paste the time stamps and chapter names from the YouTube video description into the `chapter_part_in_description` variable.
 
 ``` Python 
@@ -38,12 +45,6 @@ youtube_video_id="MZQ6bc6mPAE"
 
 # Language of subscription 
 language = "ko"
-
-# LLM: Recommended parameters for my testing. 
-max_token = 3000
-model = "gpt-3.5-turbo"
-chunk_size = 900
-chunk_overlap = 100
 
 # Officially no way to get chapter automatically, 
 # so copy and paste the time stamp and chapter in description of Youtube video. 
@@ -73,15 +74,17 @@ chapter_part_in_description = """
 ```
 
 3. Run notebook and you can get the `markdown_note.md`.
-   - This file has the script and summary for each chapter. 
+   - This file has the script and summary for each chapter.
 
 
 ## Trobleshooting
   - Please define '00:00:00' as start in `chapter_part_in_description`.
-  
+  - Keep the duration of chapter within 20 minutes for stable performance.
+    - If some chapter is longer than 20 minutes, then add more chapters temporary.
+  - Need 
   
 ## FAQ 
-- To-Do 
+- To-Do
 
 
 
