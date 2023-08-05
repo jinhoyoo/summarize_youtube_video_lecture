@@ -19,3 +19,8 @@ ipython_config.py
 # End of https://www.toptal.com/developers/gitignore/api/jupyternotebooks
 
 .env
+.vscode/
+__pycache__/
+audio/
+text/
+note/
