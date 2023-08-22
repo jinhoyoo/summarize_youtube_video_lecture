@@ -66,64 +66,59 @@ def summarize_text(text, max_token=3000, model="gpt-3.5-turbo", language="ko"):
 
 
 
-def rectify_note_with_summarized_note_and_original_text(note, text, max_token=3000, model="gpt-3.5-turbo", language="ko"):
+def clean_up_sentence_punctuation_and_fix_errors(text:str, hint_to_fix:str, chunk_size:int=1000, max_token:int=3000, model:str="gpt-3.5-turbo", verbose:bool = False )->str:
 
- 
-    prompt = f"""
-아래 글을 원문이야. 
-----------
-{text}
+    from langchain import PromptTemplate
+    from langchain.chains import LLMChain
+    from langchain.chat_models import ChatOpenAI
+    from langchain.docstore.document import Document
+    from langchain.text_splitter import CharacterTextSplitter
 
-아래 글은 위의 글을 바탕으로 정리한거야. 
-----------
-{note}
+    llm = ChatOpenAI(temperature=0.0, model_name=model, max_tokens=max_token)
 
-위에 글과, 아래글을 보고 잘 다시 핵심만 노트로 정리해줘. 중요한건 -표시로 Markdown처럼 아래처럼 구조적으로 정리해줘.
+    # Setup Map process
+    correct_template = PromptTemplate.from_template("""
+    아래 텍스트에의 문장부호를 다 정리해줘. 그리고 소리나는대로 잘못 적은 단어를 고쳐줘. 내용상 나뉘어야 하면 줄바꿈도 해줘. 고유명사 틀린것도 수정해줘.
+    그리고 아래 예제처럼 자주 틀리는 것들이 있으니 참고해서 수정해줘. {hint_to_fix}
+    
+    \"\"\"
+    {docs}
+    \"\"\"
+                                                    
+    출력양식
+    문서:""")
 
-text
-- sub text
-- sub text 
-....
 
 
-"""
+    # Create docs from text
+    docs = Document( page_content=text, metadata={"source":"local"} )
 
-    time.sleep(0.5) # Avoid the bad request error. 
-    response = openai.ChatCompletion.create(
-        model=model,
-        messages=[
-            {"role": "system", "content": "You are a university student."},
-            {"role": "user", "content": prompt}
-        ],
-        max_tokens=max_token
+    # Split text
+    if verbose:
+        print(f'chunk_size = {chunk_size}')
+
+    text_splitter = CharacterTextSplitter(
+        chunk_size = chunk_size,
+        chunk_overlap  = 0,
+        separator = '. '
     )
 
-    corrected_note = response.choices[0].message.content
-    return corrected_note
+    splited_docs = text_splitter.split_documents([docs])
 
+    # Run chain
+    merged_document = ""
+    for doc in splited_docs:
+        chain = LLMChain(llm=llm,prompt=correct_template, verbose=verbose)        
+        corrected_doc = chain.run( 
+            {
+                "docs":doc.page_content,
+                "hint_to_fix": hint_to_fix
+             } 
+        )
+        merged_document += corrected_doc
+        merged_document += '\n\n'
 
-def add_symbols_and_fix_errata(text, max_token=3000, model="gpt-3.5-turbo", language="ko"):
-
- 
-    prompt = f"""
-아래 문장의 문장부호를 다 정리해줘. 그리고 소리나는대로 잘못 적은 단어를 고쳐줘. 내용상 나뉘어야 하면 줄바꿈도 해줘.
-----------
-{text}
-
-"""
-
-    time.sleep(0.5) # Avoid the bad request error. 
-    response = openai.ChatCompletion.create(
-        model=model,
-        messages=[
-            {"role": "system", "content": "You are a university student."},
-            {"role": "user", "content": prompt}
-        ],
-        max_tokens=max_token
-    )
-
-    corrected_note = response.choices[0].message.content
-    return corrected_note
+    return merged_document
 
 
 def main():
@@ -145,6 +140,7 @@ def main():
 
     rewritten_note = rectify_note_with_summarized_note_and_original_text(note, text)
     print(rewritten_note)
+
 
 
 if __name__ == "__main__":
