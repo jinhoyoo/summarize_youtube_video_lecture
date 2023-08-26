@@ -1,78 +1,92 @@
-import os
-import time 
-import openai
+
 from dotenv import load_dotenv
 
-def correct_text(text, max_token=3000, model="gpt-3.5-turbo", language="ko"):
+from langchain import PromptTemplate
+from langchain.chains import LLMChain
+from langchain.chat_models import ChatOpenAI
+from langchain.docstore.document import Document
+from langchain.chains.combine_documents.map_reduce import MapReduceDocumentsChain
+from langchain.chains.combine_documents.reduce import ReduceDocumentsChain
+from langchain.chains.combine_documents.stuff import StuffDocumentsChain
+from langchain.text_splitter import CharacterTextSplitter
 
-    prompt = {
-        "ko":"아래 문장의 문장부호를 다 정리해줘. 그리고 소리나는대로 잘못 적은 단어를 고쳐줘. 내용상 나뉘어야 하면 줄바꿈도 해줘.", 
-        "en":"Please organize the punctuation marks in the following sentences. Also, correct any incorrectly written words as you hear them. If there should be divisions in content, please include line breaks"
-    }
 
-    positioned_command = {
-        "ko": "한국어로 교정한 글들",
-        "en": "Corrected text"
-    }
+def summary_docs(text:str, chunk_size=1000, chunk_overlap=10, verbose = False)->str:
 
-    prompt = \
-f"""
-{prompt[language]}
+    llm = ChatOpenAI(temperature=0)
 
-{text}
-"""
+    # Map
+    map_template = """이것은 문서의 집합이야.
     
-    time.sleep(0.5) # Avoid the bad request error. 
-    response = openai.ChatCompletion.create(
-        model=model,
-        messages=[
-            {"role": "system", "content": "You are a university student."},
-            {"role": "user", "content": prompt}
-        ],
-        max_tokens=max_token
+    \"\"\"
+    {docs}
+    \"\"\"
+
+    당신은 대학생입니다. 이 문서 목록을 기반으로 주제를 파악하여 아래 처럼 구조화된 노트를 작성해보세요.
+    
+    - 주제 1
+       - 소주제1
+    - 주제 2
+       - 소주제1
+ 
+    요약된 노트:"""
+    map_prompt = PromptTemplate.from_template(map_template)
+    map_chain = LLMChain(llm=llm, prompt=map_prompt, verbose=verbose)
+
+    # Reduce
+    reduce_template = """이것은 요약 노트의 집합이야.:
+
+    \"\"\"
+    {doc_summaries}
+    \"\"\"
+    
+    이를 취합하여 주요 주제를 최종적으로 통합한 요약을 작성하세요. 
+    요약 노트:
+    """
+    reduce_prompt = PromptTemplate.from_template(reduce_template)
+    reduce_chain = LLMChain(llm=llm, prompt=reduce_prompt, verbose=verbose)
+
+
+    # Takes a list of documents, combines them into a single string, and passes this to an LLMChain
+    combine_documents_chain = StuffDocumentsChain(
+        llm_chain=reduce_chain, document_variable_name="doc_summaries"
     )
 
-    corrected_text = response.choices[0].message.content
-    return corrected_text
-
-
-def summarize_text(text, max_token=3000, model="gpt-3.5-turbo", language="ko"):
-
-    positioned_command = {
-        "ko": "한국어로 요약한 글",
-        "en": "Summary note"
-    }
-        
-    prompt = f"""
-
-    아래 글들을 노트로 정리해줘. 중요한건 -표시로 Markdown처럼 아래처럼 구조적으로 정리해줘. 그리고 정리한 내용과 원문을 다시 보고, 중요한건 -표시로 Markdown처럼 구조적으로 정리해줘. 가장 마지막에 정리한 것만 출력해줘.
-----------
-{text}
-
-        """
-
-    time.sleep(0.5) # Avoid the bad request error. 
-    response = openai.ChatCompletion.create(
-        model=model,
-        messages=[
-            {"role": "system", "content": "You are a university student."},
-            {"role": "user", "content": prompt}
-        ],
-        max_tokens=max_token
+    # Combines and iteravely reduces the mapped documents
+    reduce_documents_chain = ReduceDocumentsChain(
+        # This is final chain that is called.
+        combine_documents_chain=combine_documents_chain,
+        # If documents exceed context for `StuffDocumentsChain`
+        collapse_documents_chain=combine_documents_chain,
+        # The maximum number of tokens to group documents into.
+        token_max=4000,
+        verbose=verbose
     )
 
-    corrected_text = response.choices[0].message.content
-    return corrected_text
+    # Combining documents by mapping a chain over them, then combining results
+    map_reduce_chain = MapReduceDocumentsChain(
+        # Map chain
+        llm_chain=map_chain,
+        # Reduce chain
+        reduce_documents_chain=reduce_documents_chain,
+        # The variable name in the llm_chain to put the documents in
+        document_variable_name="docs",
+        # Return the results of the map steps in the output
+        return_intermediate_steps=False,
+        verbose=verbose
+    )
 
+    text_splitter = CharacterTextSplitter.from_tiktoken_encoder(
+        chunk_size=chunk_size, chunk_overlap=chunk_overlap
+    )
+    docs = Document( page_content=text, metadata={"source":"local"} )
+    split_docs = text_splitter.split_documents([docs])
 
+    result = map_reduce_chain.run(split_docs)
+    return result
 
 def clean_up_sentence_punctuation_and_fix_errors(text:str, hint_to_fix:str, chunk_size:int=1000, max_token:int=3000, model:str="gpt-3.5-turbo", verbose:bool = False )->str:
 
-    from langchain import PromptTemplate
-    from langchain.chains import LLMChain
-    from langchain.chat_models import ChatOpenAI
-    from langchain.docstore.document import Document
-    from langchain.text_splitter import CharacterTextSplitter
 
     llm = ChatOpenAI(temperature=0.0, model_name=model, max_tokens=max_token)
 
