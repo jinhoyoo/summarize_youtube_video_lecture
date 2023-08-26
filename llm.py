@@ -88,7 +88,7 @@ def summary_docs(text:str, chunk_size=1000, chunk_overlap=10, verbose = False)->
 def clean_up_sentence_punctuation_and_fix_errors(text:str, hint_to_fix:str, chunk_size:int=1000, max_token:int=3000, model:str="gpt-3.5-turbo", verbose:bool = False )->str:
 
 
-    llm = ChatOpenAI(temperature=0.0, model_name=model, max_tokens=max_token)
+    llm = ChatOpenAI(temperature=0.0, model=model, max_tokens=max_token)
 
     # Setup Map process
     correct_template = PromptTemplate.from_template("""
@@ -114,7 +114,8 @@ def clean_up_sentence_punctuation_and_fix_errors(text:str, hint_to_fix:str, chun
     text_splitter = CharacterTextSplitter(
         chunk_size = chunk_size,
         chunk_overlap  = 0,
-        separator = '. '
+        length_function = len,
+        separator = " ",
     )
 
     splited_docs = text_splitter.split_documents([docs])
