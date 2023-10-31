@@ -13,7 +13,7 @@ from langchain.text_splitter import CharacterTextSplitter
 
 def summary_docs(text:str, chunk_size=1000, chunk_overlap=10, verbose = False)->str:
 
-    llm = ChatOpenAI(temperature=0)
+    llm = ChatOpenAI(temperature=0.1, model="gpt-3.5-turbo")
 
     # Map
     map_template = """이것은 문서의 집합이야.
@@ -22,12 +22,7 @@ def summary_docs(text:str, chunk_size=1000, chunk_overlap=10, verbose = False)->
     {docs}
     \"\"\"
 
-    당신은 대학생입니다. 이 문서 목록을 기반으로 주제를 파악하여 아래 처럼 구조화된 노트를 작성해보세요.
-    
-    - 주제 1
-       - 소주제1
-    - 주제 2
-       - 소주제1
+    당신은 Jonoulist다. 이 문서 목록을 기반으로 주제를 파악하여 아래처럼 구조화된 노트를 작성해줘.
  
     요약된 노트:"""
     map_prompt = PromptTemplate.from_template(map_template)
@@ -40,7 +35,7 @@ def summary_docs(text:str, chunk_size=1000, chunk_overlap=10, verbose = False)->
     {doc_summaries}
     \"\"\"
     
-    이를 취합하여 주요 주제를 최종적으로 통합한 요약을 작성하세요. 
+    이를 취합하여 주요 주제를 최종적으로 통합한 요약을 작성하줘. 
     요약 노트:
     """
     reduce_prompt = PromptTemplate.from_template(reduce_template)
