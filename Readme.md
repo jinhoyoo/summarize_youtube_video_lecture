@@ -74,7 +74,7 @@ chapter_part_in_description = """
 
 ```
 
-3. Run notebook and you can get the `markdown_note.md`.
+3. Run `summarize_note.ipynb` notebook and you can get the `markdown_note.md`.
    - This file has the script and summary for each chapter. 
 
 6. Run `clean_data.ipynb` to clean up the temporary and result data. 
