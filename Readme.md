@@ -90,6 +90,8 @@ chapter_part_in_description = """
 5. Run `summarize_note.ipynb` to generate the `markdown_note.md`.
    - This file has the script and summary for each chapter.
 
+6. Run `clean_data.ipynb` to clean up the temporary and result data. 
+
 ## Trobleshooting
   - Please define '00:00:00' as start in `chapter_part_in_description`.
   - Keep the duration of chapter within 20 minutes for stable performance.
