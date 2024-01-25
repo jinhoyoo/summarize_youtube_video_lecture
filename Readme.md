@@ -36,12 +36,7 @@ Youtube Script Summarizer is a tool that helps summarize YouTube scripts by chap
 - Edit the variables in the "Input variables" cell according to your requirements.
    - Provide the YouTube video ID (`youtube_video_id`) for which you want to generate a summary.
    - Specify the language of the subscription (`language`).
-   - Adjust the parameters for generating the summary:
-     - `max_token`: The maximum number of tokens in the generated summary.
-     - `model`: The OpenAI model to use for generating the summary.
-     - `chunk_size`: The size of each chunk of text for processing.
-     - `chunk_overlap`: The overlap between each chunk.
-  - Copy and paste the time stamps and chapter names from the YouTube video description into the `chapter_part_in_description` variable.
+   - Copy and paste the time stamps and chapter names from the YouTube video description into the `chapter_part_in_description` variable.
 
 ``` Python 
 
@@ -51,11 +46,6 @@ youtube_video_id="MZQ6bc6mPAE"
 # Language of subscription 
 language = "ko"
 
-# LLM: Recommended parameters for my testing. 
-max_token = 3000
-model = "gpt-3.5-turbo"
-chunk_size = 900
-chunk_overlap = 100
 
 # Officially no way to get chapter automatically, 
 # so copy and paste the time stamp and chapter in description of Youtube video. 
@@ -84,11 +74,8 @@ chapter_part_in_description = """
 
 ```
 
-4. The transcripts can be found in the `./text` folder. Please review the transcripts and make necessary corrections to ensure accuracy.
-
-
-5. Run `summarize_note.ipynb` to generate the `markdown_note.md`.
-   - This file has the script and summary for each chapter.
+3. Run notebook and you can get the `markdown_note.md`.
+   - This file has the script and summary for each chapter. 
 
 6. Run `clean_data.ipynb` to clean up the temporary and result data. 
 
