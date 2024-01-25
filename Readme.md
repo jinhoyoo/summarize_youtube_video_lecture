@@ -25,18 +25,18 @@ Youtube Script Summarizer is a tool that helps summarize YouTube scripts by chap
 ## Usage
 
 0. Clone this project and setup Python over v3.11.x. 
-1. Install dependency 
 
-``` bash 
-$ pip install -r requirements.txt
-```
+1. Open `setup.ipynb` and run to setup project.
 
-2. Open `summary.ipynb`
+2. Setup OPENAI_API_KEY.
+  - Create `.env` file and set `OPENAI_API_KEY` variable. 
+
+3. Open `transcript.ipynb`
 - Create `.env` file and set `OPENAI_API_KEY` variable. 
 - Edit the variables in the "Input variables" cell according to your requirements.
    - Provide the YouTube video ID (`youtube_video_id`) for which you want to generate a summary.
    - Specify the language of the subscription (`language`).
-  - Copy and paste the time stamps and chapter names from the YouTube video description into the `chapter_part_in_description` variable.
+   - Copy and paste the time stamps and chapter names from the YouTube video description into the `chapter_part_in_description` variable.
 
 ``` Python 
 
@@ -45,6 +45,7 @@ youtube_video_id="MZQ6bc6mPAE"
 
 # Language of subscription 
 language = "ko"
+
 
 # Officially no way to get chapter automatically, 
 # so copy and paste the time stamp and chapter in description of Youtube video. 
@@ -73,9 +74,10 @@ chapter_part_in_description = """
 
 ```
 
-3. Run notebook and you can get the `markdown_note.md`.
-   - This file has the script and summary for each chapter.
+3. Run `summarize_note.ipynb` notebook and you can get the `markdown_note.md`.
+   - This file has the script and summary for each chapter. 
 
+6. Run `clean_data.ipynb` to clean up the temporary and result data. 
 
 ## Trobleshooting
   - Please define '00:00:00' as start in `chapter_part_in_description`.
